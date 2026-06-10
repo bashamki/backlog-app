@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole       { pm_editor viewer }
+enum PriorityLabel  { hot high medium low none }
+enum TaskStatus     { todo in_progress done paused }
+enum WeeekTaskType  { action meeting call }
+enum SprintState    { planned active closed }
+enum TaskSprintKind { planned carried completed }
+enum CustomFieldType { text number boolean datetime select multiselect member contact link approval }
+
+model Workspace {
+  id        String     @id @default(uuid())
+  name      String
+  createdAt DateTime   @default(now())
+  users     AppUser[]
+  epics     Epic[]
+  tags      Tag[]
+  sprints   Sprint[]
+  tasks     Task[]
+  customFields CustomFieldDef[]
+}
+
+model AppUser {
+  id           String    @id @default(uuid())
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+  email        String
+  passwordHash String
+  role         UserRole  @default(viewer)
+  createdAt    DateTime  @default(now())
+  @@unique([workspaceId, email])
+}
+
+model Epic {
+  id              String    @id @default(uuid())
+  workspaceId     String
+  workspace       Workspace @relation(fields: [workspaceId], references: [id])
+  title           String
+  color           String?
+  position        Float     @default(0)
+  weeekProjectId  BigInt?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+  tasks           Task[]
+}
+
+model Tag {
+  id           String    @id @default(uuid())
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+  name         String
+  color        String?
+  weeekTagId   BigInt?
+  taskTags     TaskTag[]
+  @@unique([workspaceId, name])
+}
+
+model Sprint {
+  id            String       @id @default(uuid())
+  workspaceId   String
+  workspace     Workspace    @relation(fields: [workspaceId], references: [id])
+  name          String
+  year          Int
+  weekNo        Int
+  state         SprintState  @default(planned)
+  weeekBoardId  BigInt?
+  createdAt     DateTime     @default(now())
+  taskSprints   TaskSprint[]
+  @@unique([workspaceId, year, weekNo])
+}
+
+model Task {
+  id            String    @id @default(uuid())
+  workspaceId   String
+  workspace     Workspace @relation(fields: [workspaceId], references: [id])
+  epicId        String?
+  epic          Epic?     @relation(fields: [epicId], references: [id])
+  parentId      String?
+  parent        Task?     @relation("Subtasks", fields: [parentId], references: [id])
+  children      Task[]    @relation("Subtasks")
+
+  // app fields
+  position       Float          @default(0)
+  priorityLabel  PriorityLabel  @default(none)
+  isConditional  Boolean        @default(false)
+  conditionText  String?
+  conditionMet   Boolean        @default(false)
+  status         TaskStatus     @default(todo)
+  hoursPlan      Float?
+  hoursFact      Float?
+  weeekUrl       String?
+  description    String?
+
+  // denormalized multi-sprint shortcuts (full history in TaskSprint)
+  startedSprintId   String?
+  completedSprintId String?
+
+  // Weeek mirrored scalar fields
+  weeekTaskId        BigInt?  @unique
+  weeekParentId      BigInt?
+  title              String
+  weeekType          WeeekTaskType?
+  weeekPriority      Int?
+  isCompleted        Boolean  @default(false)
+  isPrivate          Boolean  @default(false)
+  weeekIsDeleted     Boolean  @default(false)
+  weeekAuthorId      String?
+  weeekUserId        String?
+  weeekBoardId       BigInt?
+  weeekBoardColumnId BigInt?
+  weeekProjectId     BigInt?
+  image              String?
+  date               DateTime?
+  time               String?
+  durationMin        Int?
+  dateStart          DateTime?
+  dateEnd            DateTime?
+  overdue            Int?
+  weeekCreatedAt     DateTime?
+  weeekUpdatedAt     DateTime?
+
+  // extension & fidelity
+  ext        Json     @default("{}")
+  weeekRaw   Json?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+
+  assignees   TaskAssignee[]
+  subscribers TaskSubscriber[]
+  taskTags    TaskTag[]
+  locations   TaskLocation[]
+  workloads   TaskWorkload[]
+  timeEntries TaskTimeEntry[]
+  attachments TaskAttachment[]
+  taskSprints TaskSprint[]
+  history     TaskHistory[]
+}
+
+model TaskAssignee {
+  taskId      String
+  task        Task   @relation(fields: [taskId], references: [id])
+  weeekUserId String
+  @@id([taskId, weeekUserId])
+}
+
+model TaskSubscriber {
+  taskId      String
+  task        Task   @relation(fields: [taskId], references: [id])
+  weeekUserId String
+  @@id([taskId, weeekUserId])
+}
+
+model TaskTag {
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id])
+  tagId  String
+  tag    Tag    @relation(fields: [tagId], references: [id])
+  @@id([taskId, tagId])
+}
+
+model TaskLocation {
+  id                 String  @id @default(uuid())
+  taskId             String
+  task               Task    @relation(fields: [taskId], references: [id])
+  weeekProjectId     BigInt?
+  weeekBoardId       BigInt?
+  weeekBoardColumnId BigInt?
+}
+
+model TaskWorkload {
+  id             String    @id @default(uuid())
+  taskId         String
+  task           Task      @relation(fields: [taskId], references: [id])
+  weeekWorkloadId String?
+  weeekUserId    String?
+  type           Int?
+  date           DateTime?
+  durationMin    Int?
+  workStartAt    DateTime?
+  workEndAt      DateTime?
+}
+
+model TaskTimeEntry {
+  id           String    @id @default(uuid())
+  taskId       String
+  task         Task      @relation(fields: [taskId], references: [id])
+  weeekEntryId String?
+  weeekUserId  String?
+  durationMin  Int?
+  startedAt    DateTime?
+  comment      String?
+}
+
+model TaskAttachment {
+  id                 String  @id @default(uuid())
+  taskId             String
+  task               Task    @relation(fields: [taskId], references: [id])
+  weeekAttachmentId  String?
+  fileName           String?
+  url                String?
+  mime               String?
+  sizeBytes          BigInt?
+}
+
+model CustomFieldDef {
+  id           String          @id @default(uuid())
+  workspaceId  String
+  workspace    Workspace       @relation(fields: [workspaceId], references: [id])
+  key          String
+  label        String
+  type         CustomFieldType
+  options      Json?
+  weeekFieldId String?
+  createdAt    DateTime        @default(now())
+  @@unique([workspaceId, key])
+}
+
+model TaskSprint {
+  taskId   String
+  task     Task           @relation(fields: [taskId], references: [id])
+  sprintId String
+  sprint   Sprint         @relation(fields: [sprintId], references: [id])
+  kind     TaskSprintKind @default(planned)
+  addedAt  DateTime       @default(now())
+  @@id([taskId, sprintId])
+}
+
+model TaskHistory {
+  id         String   @id @default(uuid())
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id])
+  field      String
+  oldValue   String?
+  newValue   String?
+  changedBy  String?
+  changedAt  DateTime @default(now())
+}

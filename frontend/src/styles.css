@@ -1,0 +1,64 @@
+:root { --bg:#14130f; --panel:#1b1a14; --raised:#23211a; --line:#39342a; --ink:#f3eede; --muted:#9c9685; --accent:#f0b429; }
+* { box-sizing:border-box; }
+body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--ink); }
+button { font-family:inherit; cursor:pointer; }
+input, textarea, select { font-family:inherit; }
+a { color:var(--accent); }
+.muted { color:var(--muted); } .small { font-size:12px; } .pad { padding:16px; }
+.err { color:#e5484d; font-size:13px; }
+
+/* login */
+.login { min-height:100vh; display:flex; align-items:center; justify-content:center; }
+.login-card { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:32px; width:340px; display:flex; flex-direction:column; gap:12px; }
+.brand { font-weight:700; letter-spacing:2px; color:var(--accent); }
+.brand.big { font-size:28px; text-align:center; }
+.login-card label { display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted); }
+.login-card input, .drawer input, .drawer textarea, .drawer select, .add-sprint input { background:var(--bg); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:9px; }
+
+/* layout */
+.top { display:flex; align-items:center; gap:18px; padding:12px 22px; border-bottom:1px solid var(--line); background:var(--panel); }
+.top nav { display:flex; gap:6px; }
+.top nav button { background:none; border:1px solid transparent; color:var(--muted); padding:7px 13px; border-radius:8px; }
+.top nav button.on { background:var(--accent); color:#14130f; }
+.who { margin-left:auto; color:var(--muted); font-size:12px; }
+.logout { background:none; border:1px solid var(--line); color:var(--muted); border-radius:8px; padding:7px 12px; }
+main { max-width:1100px; margin:0 auto; padding:22px; }
+.page-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+h2 { font-size:22px; margin:0; }
+button.primary { background:var(--accent); color:#14130f; border:none; border-radius:8px; padding:8px 14px; font-weight:600; }
+button.danger, button.x { background:none; border:1px solid var(--line); color:#e5484d; border-radius:8px; padding:6px 10px; }
+
+/* backlog */
+.epic h3 { display:flex; align-items:center; gap:8px; font-size:16px; border-left:3px solid var(--accent); padding-left:10px; margin:18px 0 8px; }
+.cnt { color:var(--muted); font-size:12px; font-weight:400; }
+.row { display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:6px; }
+.grip { cursor:grab; color:var(--line); user-select:none; }
+.r-title { flex:1; cursor:pointer; }
+.cond { font-size:10px; color:var(--accent); border:1px solid var(--accent); border-radius:5px; padding:1px 5px; margin-left:8px; }
+.chip { color:#14130f; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; }
+.status { font-size:12px; color:var(--muted); width:64px; }
+.hours { font-family:monospace; font-size:12px; background:var(--raised); padding:3px 7px; border-radius:6px; }
+.weeek { font-size:12px; }
+.add-task { background:none; border:1px dashed var(--line); color:var(--muted); border-radius:8px; padding:6px 12px; margin-bottom:10px; }
+
+/* drawer */
+.drawer-bg { position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; justify-content:flex-end; }
+.drawer { width:420px; max-width:100%; background:var(--panel); height:100%; padding:24px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
+.drawer label { display:flex; flex-direction:column; gap:5px; font-size:12px; color:var(--muted); }
+.d-title { font-size:18px; font-weight:600; background:var(--bg); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:10px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.check { flex-direction:row !important; align-items:center; gap:8px; color:var(--ink) !important; }
+.d-actions { display:flex; justify-content:space-between; margin-top:10px; }
+
+/* sprints */
+.add-sprint { display:flex; align-items:center; gap:8px; }
+.add-sprint input { width:70px; }
+.board { display:flex; gap:12px; overflow-x:auto; }
+.col { flex:0 0 240px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px; }
+.col-h { display:flex; justify-content:space-between; font-weight:600; font-size:14px; padding:4px 4px 10px; border-bottom:1px solid var(--line); margin-bottom:8px; }
+.scard { background:var(--raised); border:1px solid var(--line); border-radius:9px; padding:9px; margin-bottom:7px; }
+.sc-title { font-size:13px; margin-bottom:7px; }
+.sc-bot { display:flex; align-items:center; gap:6px; }
+.sc-bot select { margin-left:auto; background:var(--bg); border:1px solid var(--line); color:var(--muted); border-radius:6px; font-size:11px; padding:2px; }
+.span { font-family:monospace; font-size:11px; color:var(--accent); }
+.x { margin-left:auto; padding:2px 8px; }
