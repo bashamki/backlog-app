@@ -7,13 +7,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole       { pm_editor viewer }
-enum PriorityLabel  { hot high medium low none }
-enum TaskStatus     { todo in_progress done paused }
-enum WeeekTaskType  { action meeting call }
-enum SprintState    { planned active closed }
-enum TaskSprintKind { planned carried completed }
-enum CustomFieldType { text number boolean datetime select multiselect member contact link approval }
+enum UserRole {
+  pm_editor
+  viewer
+}
+
+enum PriorityLabel {
+  hot
+  high
+  medium
+  low
+  none
+}
+
+enum TaskStatus {
+  todo
+  in_progress
+  done
+  paused
+}
+
+enum WeeekTaskType {
+  action
+  meeting
+  call
+}
+
+enum SprintState {
+  planned
+  active
+  closed
+}
+
+enum TaskSprintKind {
+  planned
+  carried
+  completed
+}
+
+enum CustomFieldType {
+  text
+  number
+  boolean
+  datetime
+  select
+  multiselect
+  member
+  contact
+  link
+  approval
+}
 
 model Workspace {
   id        String     @id @default(uuid())
